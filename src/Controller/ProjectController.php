@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Project;
 use Doctrine\Persistence\ManagerRegistry;
-use http\Env\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -30,9 +29,7 @@ class ProjectController extends AbstractController
         return $this->json($data);
     }
 
-//post
-//getOnebyid
-//delete
+
     #[Route('/project/post', name: 'app_post', methods: ['GET','POST'])]
     public function post(ManagerRegistry $doctrine): JsonResponse
     {
@@ -48,6 +45,26 @@ class ProjectController extends AbstractController
         $entityManager->flush();
 
         return $this->json('bien jouer hermano c\'est envoyer');
+    }
+
+
+    #[Route('/project/{id}/update', name: 'app_post', methods: ['GET','PUT'])]
+    public function update(ManagerRegistry $doctrine, $id): JsonResponse
+    {
+        //Gere l envoie de données entre bdd et php
+        $entityManager = $doctrine->getManager();
+
+        $post = $doctrine
+            ->getRepository(Project::class)
+            ->findOneById($id);
+
+        $post->setName('edit');
+        $post->setDescription('adzdazdazd');
+
+        $entityManager->persist($post);
+        $entityManager->flush();
+
+        return $this->json('Post Modifié');
     }
 
 
@@ -71,7 +88,6 @@ class ProjectController extends AbstractController
         $project = $doctrine->getRepository(Project::class)->findOneById($id);
         $entityManager->remove($project);
         $entityManager->flush($project);
-
 
         return $this->json('Ca a bien était delete');
     }
